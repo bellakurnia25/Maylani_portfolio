@@ -1,0 +1,169 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap");
+:root{--cream:#f4ece3;--ink:#3b2420;--violet:#8b6fd1}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:#ebe1d6;font-family:Montserrat,system-ui,sans-serif}
+
+/* navbar (muncul sejak halaman pertama) */
+.nav{position:fixed;top:14px;left:0;right:0;z-index:10;display:flex;justify-content:center;padding:0 12px;pointer-events:none}
+.nav nav{pointer-events:auto;display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none;padding:6px;border-radius:999px;background:rgba(244,236,227,.94);backdrop-filter:blur(10px);box-shadow:0 6px 22px rgba(59,36,32,.14);animation:drop .7s both}
+.nav a{position:relative;padding:8px 15px;border-radius:999px;color:var(--ink);font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .25s,color .25s}
+.nav a:hover{background:rgba(59,36,32,.07)}
+.nav a::after{content:"";position:absolute;left:50%;bottom:3px;width:18px;height:3px;margin-left:-9px;border-radius:3px;background:var(--violet);transform:scaleX(0);transition:transform .3s}
+.nav a.on{font-weight:600}.nav a.on::after{transform:scaleX(1)}
+
+/* slide: ukuran dibatasi agar tidak terlalu besar di desktop */
+.stage{width:min(1080px,100% - 24px);margin:0 auto;padding:86px 0 56px;display:grid;gap:28px}
+.slide{aspect-ratio:16/9;border-radius:0px;overflow:hidden;background:#fff;box-shadow:0 10px 30px rgba(59,36,32,.12);transition:translate .35s,box-shadow .35s}
+.slide:hover{translate:0 -5px;box-shadow:0 20px 44px rgba(59,36,32,.2)}
+.slide img{display:block;width:100%;height:100%;user-select:none}
+
+/* animasi — murni CSS */
+@keyframes drop{from{opacity:0;transform:translateY(-26px)}}
+@keyframes reveal{from{opacity:0;transform:translateY(36px) scale(.97)}}
+@keyframes grow{from{transform:scaleX(0)}}
+@supports (animation-timeline:view()){
+  .slide{animation:reveal linear both;animation-timeline:view();animation-range:entry 0% entry 40%}
+  .bar{position:fixed;top:0;left:0;right:0;height:3px;z-index:11;background:var(--violet);transform-origin:0 50%;animation:grow linear both;animation-timeline:scroll(root)}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* navbar responsif: di layar kecil jadi menu hamburger (tanpa scroll samping) */
+.burger{display:none}
+@media(max-width:980px){
+  .nav{top:10px}
+  .nav-box{position:relative;width:100%;max-width:420px}
+  .burger{pointer-events:auto;display:flex;align-items:center;justify-content:space-between;width:100%;padding:11px 20px;border:0;border-radius:999px;background:rgba(244,236,227,.94);backdrop-filter:blur(10px);box-shadow:0 6px 22px rgba(59,36,32,.14);font:600 14px Montserrat,sans-serif;color:var(--ink);cursor:pointer;animation:drop .7s both}
+  .burger i,.burger i::before,.burger i::after{width:20px;height:2px;border-radius:2px;background:var(--ink)}
+  .burger i{position:relative;transition:background .2s}
+  .burger i::before,.burger i::after{content:"";position:absolute;left:0;transition:transform .3s}
+  .burger i::before{top:-6px}.burger i::after{top:6px}
+  .open .burger i{background:transparent}
+  .open .burger i::before{transform:translateY(6px) rotate(45deg)}
+  .open .burger i::after{transform:translateY(-6px) rotate(-45deg)}
+  .nav nav{position:absolute;top:calc(100% + 8px);left:0;right:0;flex-direction:column;overflow:visible;padding:8px;border-radius:22px;animation:none;opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .25s,transform .25s,visibility .25s}
+  .open nav{opacity:1;visibility:visible;transform:none}
+  .nav a{padding:12px 18px 12px 22px;font-size:14px}
+  .nav a::after{left:8px;top:50%;bottom:auto;width:3px;height:16px;margin:-8px 0 0;transform:scaleY(0)}
+  .nav a.on::after{transform:scaleY(1)}
+  .stage{padding-top:76px;gap:18px}
+}
+
+/* ===== Animasi per lapisan (foto, bentuk, teks bergerak sendiri-sendiri) ===== */
+@keyframes fx-l{from{opacity:0;transform:translateX(-120px)}}
+@keyframes fx-r{from{opacity:0;transform:translateX(120px)}}
+@keyframes fx-u{from{opacity:0;transform:translateY(60px)}}
+@keyframes fx-z{from{opacity:0;transform:scale(.88)}}
+@keyframes float{50%{transform:translateY(14px) scale(1.02)}}
+.slide{animation:none}
+.frame{position:relative;width:100%;height:100%}
+.layer{position:absolute;inset:0;pointer-events:none}
+.layer img{width:100%;height:100%;display:block}
+.d-l{--k:fx-l}.d-r{--k:fx-r}.d-u{--k:fx-u}.d-z{--k:fx-z}
+/* slide pertama: animasi saat halaman dibuka */
+.first .layer:not(.l-bg){animation:var(--k) .9s calc(var(--i)*.08s) cubic-bezier(.2,.8,.2,1) both}
+/* slide lain: animasi saat di-scroll, berurutan */
+@supports (animation-timeline:view()){
+  .slide:not(.first) .layer:not(.l-bg){animation:var(--k) linear both;animation-timeline:view();animation-range:entry calc(var(--i)*3%) entry calc(var(--i)*3% + 45%)}
+}
+/* gerak halus bentuk dekoratif + efek kedalaman saat di-hover */
+.l-big img{animation:float 11s ease-in-out infinite;animation-delay:calc(var(--i)*-1.3s)}
+.l-img img,.l-small img{transition:scale .6s,translate .6s}
+.slide:hover .l-img img{scale:1.03}
+.slide:hover .l-small img{translate:0 -3px}
+
+/* Matikan animasi sertifikat + bingkai hitamnya. Latar dan judul tetap beranimasi. */
+:is(
+  #sertifikat .layer:nth-child(n+5):nth-child(-n+6),   /* slide 12 */
+  #slide-13  .layer:nth-child(n+4):nth-child(-n+7),    /* slide 13 */
+  #slide-14  .layer:nth-child(n+4):nth-child(-n+7)     /* slide 14 */
+) {
+  animation: none !important;
+}
+
+:is(
+  #sertifikat .layer:nth-child(n+5):nth-child(-n+6),
+  #slide-13  .layer:nth-child(n+4):nth-child(-n+7),
+  #slide-14  .layer:nth-child(n+4):nth-child(-n+7)
+) img {
+  animation: none !important;
+  scale: none !important;       /* matikan efek membesar saat di-hover */
+  translate: none !important;
+}
+
+/* About: matikan animasi tulisan (judul + paragraf). Foto dan latar tetap beranimasi. */
+#about .l-small {
+  animation: none !important;
+}
+#about .l-small img {
+  animation: none !important;
+  translate: none !important;   /* matikan efek naik sedikit saat di-hover */
+}
+
+/* About: tulisan tidak bereaksi saat di-hover */
+
+/* 1) efek naik 3px khusus lapisan tulisan */
+#about .l-small img {
+  translate: none !important;
+  transition: none !important;
+}
+
+/* 2) kartu slide terangkat 5px saat di-hover dan membawa tulisannya ikut naik.
+      Baris ini menahan tulisan agar tetap di tempat. */
+#about .l-small {
+  translate: 0 0;
+  transition: translate .35s;
+}
+#about:hover .l-small {
+  translate: 0 5px;   /* sama dengan jarak angkat kartu, jadi saling meniadakan */
+}
+
+
+/* About: kartu dan tulisan tidak bereaksi sama sekali saat di-hover */
+/* About: hilangkan bayangan paragraf (lapisan salinan abu di belakang tulisan) */
+#about .layer:nth-child(5) {
+  display: none !important;
+}
+
+/* Contact: semua lapisan diam (tidak terpecah-pecah) */
+#contact .layer,
+#contact .layer img {
+  animation: none !important;
+  transition: none !important;
+  translate: none !important;
+  scale: none !important;
+  transform: none !important;
+}
+
+.slide { position: relative; }   /* wajib: agar area klik menempel di slide */
+.hit {
+  position: absolute;
+  z-index: 5;
+  display: block;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background .25s;
+}
+.hit:hover { background: rgba(139, 111, 209, .14); }
+.hit:focus-visible { outline: 2px solid #8b6fd1; outline-offset: 2px; }
+
+/* foto hero pengganti */
+.layer .hero-photo {
+  position: absolute;
+  left: var(--x, 0%);
+  bottom: var(--y, 0%);
+  height: var(--h, 98%);
+  width: auto;
+  max-width: none;
+}
+
+/* Semua slide: animasi masuk seperti hero, jalan sekali saat slide terlihat */
+.slide:not(.first):not(.in) .layer:not(.l-bg) {
+  animation: none;
+  opacity: 0;
+}
+.slide.in:not(.first) .layer:not(.l-bg) {
+  animation: var(--k) .9s calc(var(--i) * .08s) cubic-bezier(.2,.8,.2,1) both;
+  animation-timeline: auto;
+  animation-range: normal;
+}
